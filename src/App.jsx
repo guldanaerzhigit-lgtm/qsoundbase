@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Home, Search, Library, Heart, Play, Pause, SkipBack, SkipForward, Shuffle, Repeat2, Volume2, MoreHorizontal, Plus, Music2, Headphones, Clock3, ChevronDown, ListMusic, Disc3, Radio, Sparkles } from 'lucide-react';
 
 const tracks = [

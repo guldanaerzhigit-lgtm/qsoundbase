@@ -19,6 +19,7 @@ export default function App() {
   const [query, setQuery] = useState('');
   const [current, setCurrent] = useState(tracks[0]);
   const [playing, setPlaying] = useState(false);
+  const [shuffleOn, setShuffleOn] = useState(false);
   const [liked, setLiked] = useState([]);
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [volume, setVolume] = useState(75);
@@ -53,7 +54,8 @@ export default function App() {
   };
   const nextTrack = (direction = 1) => {
     const index = tracks.findIndex(t => t.id === current?.id);
-    const next = tracks[(index + direction + tracks.length) % tracks.length];
+    const nextIndex = shuffleOn && direction > 0 ? Math.floor(Math.random() * tracks.length) : (index + direction + tracks.length) % tracks.length;
+    const next = tracks[nextIndex];
     setCurrent(next); setPlaying(Boolean(next.url)); setProgress(0);
   };
   const toggleLike = (id) => setLiked(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
@@ -91,7 +93,7 @@ export default function App() {
       </div>
     </main>
 
-    <div className="player-bar"><div className="now-playing"><Cover track={current || tracks[0]} small/><div className="now-text"><b>{current?.title || 'Выбери трек'}</b><span>{current?.artist || 'QSoundBase'}</span></div><button className={liked.includes(current?.id)?'like-button liked':'like-button'} onClick={()=>current&&toggleLike(current.id)}><Heart size={16} fill={liked.includes(current?.id)?'currentColor':'none'}/></button></div><div className="player-center"><div className="player-controls"><button title="Перемешать"><Shuffle size={15}/></button><button onClick={()=>nextTrack(-1)}><SkipBack size={19} fill="currentColor"/></button><button className="play-button" onClick={()=>current?.url?setPlaying(!playing):setPlaying(false)}>{playing?<Pause size={19} fill="currentColor"/>:<Play size={19} fill="currentColor"/>}</button><button onClick={()=>nextTrack(1)}><SkipForward size={19} fill="currentColor"/></button><button title="Повтор"><Repeat2 size={15}/></button></div><div className="progress-row"><span>0:00</span><input type="range" min="0" max="100" value={progress} onChange={e=>setProgress(Number(e.target.value))}/><span>{current?.duration || '0:00'}</span></div></div><div className="player-extra"><button><ListMusic size={17}/></button><Volume2 size={17}/><input type="range" min="0" max="100" value={volume} onChange={e=>setVolume(Number(e.target.value))}/></div></div>
+    <div className="player-bar"><div className="now-playing"><Cover track={current || tracks[0]} small/><div className="now-text"><b>{current?.title || 'Выбери трек'}</b><span>{current?.artist || 'QSoundBase'}</span></div><button className={liked.includes(current?.id)?'like-button liked':'like-button'} onClick={()=>current&&toggleLike(current.id)}><Heart size={16} fill={liked.includes(current?.id)?'currentColor':'none'}/></button></div><div className="player-center"><div className="player-controls"><button className={shuffleOn ? 'control-active' : ''} title="Перемешать" onClick={()=>setShuffleOn(!shuffleOn)}><Shuffle size={15}/></button><button onClick={()=>nextTrack(-1)}><SkipBack size={19} fill="currentColor"/></button><button className="play-button" onClick={()=>current?.url?setPlaying(!playing):setPlaying(false)}>{playing?<Pause size={19} fill="currentColor"/>:<Play size={19} fill="currentColor"/>}</button><button onClick={()=>nextTrack(1)}><SkipForward size={19} fill="currentColor"/></button><button title="Повтор"><Repeat2 size={15}/></button></div><div className="progress-row"><span>0:00</span><input type="range" min="0" max="100" value={progress} onChange={e=>setProgress(Number(e.target.value))}/><span>{current?.duration || '0:00'}</span></div></div><div className="player-extra"><button><ListMusic size={17}/></button><Volume2 size={17}/><input type="range" min="0" max="100" value={volume} onChange={e=>setVolume(Number(e.target.value))}/></div></div>
     <audio ref={audioRef} onTimeUpdate={e=>{const a=e.currentTarget;setProgress(a.duration?Math.round(a.currentTime/a.duration*100):0)}} onEnded={()=>nextTrack(1)}/>
     <nav className="mobile-nav"><button className={page==='home'?'active':''} onClick={()=>setPage('home')}><Home size={20}/><span>Главная</span></button><button className={page==='search'?'active':''} onClick={()=>setPage('search')}><Search size={20}/><span>Поиск</span></button><button className={page==='library'?'active':''} onClick={()=>setPage('library')}><Library size={20}/><span>Библиотека</span></button></nav>
   </div>;

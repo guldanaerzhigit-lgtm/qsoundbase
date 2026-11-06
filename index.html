@@ -6,6 +6,38 @@
     <meta name="theme-color" content="#0b0b12" />
     <meta name="description" content="QSoundBase — твоя музыкальная вселенная." />
     <title>QSoundBase</title>
+    <style>
+      #qsound-diagnostic{display:none;position:fixed;z-index:999999;inset:12px;overflow:auto;padding:18px;background:#180d12;color:#fff;border:2px solid #ff4d6d;border-radius:14px;font:14px/1.5 system-ui,sans-serif;white-space:pre-wrap;overflow-wrap:anywhere}
+      #qsound-diagnostic h2{margin:0 0 10px;color:#ff8298;font-size:20px}
+      #qsound-diagnostic button{margin-top:12px;padding:10px 16px;border:0;border-radius:8px;background:#ff4d6d;color:#fff;font-weight:700}
+    </style>
   </head>
-  <body><div id="root"></div><script type="module" src="/src/main.jsx"></script></body>
+  <body>
+    <div id="root"></div>
+    <div id="qsound-diagnostic"><h2>QSoundBase: ошибка запуска</h2><div id="qsound-diagnostic-text"></div><button onclick="location.reload()">Перезагрузить</button></div>
+    <script>
+      (function(){
+        var box=document.getElementById('qsound-diagnostic');
+        var out=document.getElementById('qsound-diagnostic-text');
+        function show(message){
+          out.textContent=String(message||'Неизвестная ошибка');
+          box.style.display='block';
+        }
+        window.addEventListener('error',function(e){
+          show('Ошибка: '+(e.message||'не удалось загрузить скрипт')+'\nФайл: '+(e.filename||'неизвестно')+'\nСтрока: '+(e.lineno||'?'));
+        });
+        window.addEventListener('unhandledrejection',function(e){
+          var reason=e.reason;
+          show('Promise error: '+(reason&&reason.stack||reason&&reason.message||reason||'неизвестно'));
+        });
+        setTimeout(function(){
+          var root=document.getElementById('root');
+          if(root&&!root.childElementCount){
+            show('Приложение не отобразилось за 8 секунд. JavaScript-файл мог загрузиться, но React не создал интерфейс. Проверьте, что включён JavaScript, и пришлите скриншот этого сообщения.');
+          }
+        },8000);
+      })();
+    </script>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>

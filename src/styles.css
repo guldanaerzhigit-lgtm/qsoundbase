@@ -87,3 +87,56 @@ button:active{transform:scale(.97)}
   .now-text b{max-width:30vw}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+
+/* Visual refresh: aurora night / glass music studio */
+:root{--purple:#b49aff;--cyan:#69f0df;--panel:#141522;--line:rgba(255,255,255,.09)}
+body{background:radial-gradient(ellipse at 72% -15%,rgba(110,76,190,.18),transparent 42%),#090a10}
+.sidebar{background:rgba(12,13,20,.94);backdrop-filter:blur(22px);border-right-color:#ffffff0d}
+.brand{font-size:22px;letter-spacing:-1.1px}
+.brand-mark{border-radius:13px;background:linear-gradient(135deg,#c0a6ff,#65eadb);box-shadow:0 0 34px #a78bfa45}
+.nav-item{border:1px solid transparent;transition:all .2s ease}
+.nav-item.active{background:linear-gradient(100deg,#a78bfa20,#5eead410);border-color:#a78bfa20;box-shadow:inset 3px 0 #b49aff;color:#e5dcff}
+.nav-item:hover{background:#ffffff08}
+.main-area{background:radial-gradient(ellipse at 60% 5%,#17132730,transparent 45%)}
+.topbar{background:#0b0b1290;backdrop-filter:blur(18px);border-bottom-color:#ffffff0a}
+.content{max-width:1240px;padding-top:38px}
+.greeting h1{font-size:clamp(30px,3.5vw,42px);letter-spacing:-1.8px;line-height:1.08}
+.greeting p{font-size:13px;color:#9b9bae}
+.hero{position:relative;overflow:hidden;min-height:330px;border:1px solid #c1aaff24;border-radius:28px;background:radial-gradient(ellipse at 75% 50%,#7251b640,transparent 38%),linear-gradient(115deg,#20182f 0%,#131522 55%,#10151e 100%);box-shadow:0 22px 70px #0004,inset 0 1px #ffffff10}
+.hero:before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,#171323 0%,transparent 75%);pointer-events:none}
+.hero-content{z-index:2}
+.hero h2{font-size:clamp(34px,4vw,48px);letter-spacing:-2px;line-height:1.03}
+.hero h2 span{color:#c1aaff;text-shadow:0 0 28px #b49aff30}
+.hero p{font-size:12px;line-height:1.8;color:#c4bfd2}
+.hero-art{transform:scale(1.08);filter:drop-shadow(0 20px 50px #9b7cff25)}
+.hero-disc{background:repeating-radial-gradient(circle,#191923 0 2px,#252431 3px 4px);border:1px solid #ffffff1a;box-shadow:0 0 0 12px #ffffff04,0 0 0 28px #ffffff03,0 25px 65px #0008}
+.disc-center{background:linear-gradient(135deg,#b49aff,#6ce8d8);color:#12121a}
+.primary-button{border-radius:13px;background:linear-gradient(110deg,#b49aff,#7d8cff);color:#14111f;font-weight:800;box-shadow:0 8px 30px #9b7cff35}
+.pill{border:1px solid #c1aaff20;background:#b49aff12;color:#c9b8ff}
+.section-heading h2{font-size:21px;letter-spacing:-.7px}
+.mood-card{position:relative;overflow:hidden;border:1px solid #ffffff0b;border-radius:18px;box-shadow:inset 0 1px #ffffff08;transition:transform .2s,border-color .2s}
+.mood-card:hover{transform:translateY(-3px);border-color:#b49aff50}
+.mood-violet{background:linear-gradient(130deg,#28203d,#171520)}
+.mood-blue{background:linear-gradient(130deg,#1c2c43,#141721)}
+.mood-pink{background:linear-gradient(130deg,#392332,#17151d)}
+.mood-green{background:linear-gradient(130deg,#1b3533,#15181d)}
+.track-row{border-bottom:1px solid #ffffff07;border-radius:12px;transition:background .15s}
+.track-row:hover,.track-row.selected{background:#ffffff08}
+.cover{border-radius:12px;box-shadow:0 8px 20px #0004,inset 0 1px #ffffff25}
+.player-bar{border:1px solid #ffffff12;background:rgba(15,16,25,.88);backdrop-filter:blur(28px);box-shadow:0 -12px 45px #0004}
+.play-button{background:linear-gradient(135deg,#c0a6ff,#6be9dc);color:#101018}
+.progress-row input,.player-extra input{accent-color:#b49aff}
+.search-box{border-radius:16px;background:#151520;border:1px solid #ffffff12;box-shadow:0 8px 30px #0002}
+.search-box:focus-within{border-color:#b49aff70;box-shadow:0 0 0 4px #b49aff12}
+@media(max-width:760px){
+ .content{padding:23px 15px 30px}
+ .hero{min-height:300px;border-radius:22px}
+ .hero-content{max-width:74%}
+ .hero h2{font-size:32px}
+ .hero-art{opacity:.65;right:-28px;transform:scale(.9)}
+ .hero-footer{font-size:8px;letter-spacing:.8px}
+ .section-heading h2{font-size:19px}
+ .mood-card{min-height:100px}
+ .track-row{border-radius:10px}
+ .player-bar{box-shadow:0 -8px 30px #0005}
+}

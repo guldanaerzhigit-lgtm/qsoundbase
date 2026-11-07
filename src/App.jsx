@@ -27,6 +27,10 @@ export default function App() {
   const [volume, setVolume] = useState(75);
   const [progress, setProgress] = useState(0);
   const [telegramUser, setTelegramUser] = useState(null);
+  const [localTracks, setLocalTracks] = useState([]);
+  const [myPlaylists, setMyPlaylists] = useState(() => JSON.parse(localStorage.getItem('qsb-playlists') || '[]'));
+  const [adminMode, setAdminMode] = useState(false);
+  const catalog = [...tracks, ...localTracks];
   const audioRef = useRef(null);
 
   useEffect(() => {
@@ -55,9 +59,9 @@ export default function App() {
     else { setCurrent(track); setPlaying(Boolean(track.url)); setProgress(0); }
   };
   const nextTrack = (direction = 1) => {
-    const index = tracks.findIndex(t => t.id === current?.id);
-    const nextIndex = shuffleOn && direction > 0 ? Math.floor(Math.random() * tracks.length) : (index + direction + tracks.length) % tracks.length;
-    const next = tracks[nextIndex];
+    const index = catalog.findIndex(t => t.id === current?.id);
+    const nextIndex = shuffleOn && direction > 0 ? Math.floor(Math.random() * catalog.length) : (index + direction + catalog.length) % catalog.length;
+    const next = catalog[nextIndex];
     setCurrent(next); setPlaying(Boolean(next.url)); setProgress(0);
   };
   const toggleLike = (id) => {
@@ -68,10 +72,12 @@ export default function App() {
       style: { background: '#191824', color: '#f7f7fc', border: '1px solid #a78bfa35' }
     });
   };
-  const visibleTracks = (page === 'library' && favoritesOnly ? tracks.filter(t => liked.includes(t.id)) : tracks)
+  const visibleTracks = (page === 'library' && favoritesOnly ? catalog.filter(t => liked.includes(t.id)) : catalog)
     .filter(t => (page !== 'search' || query.trim() === '' || (t.title + t.artist + t.album).toLowerCase().includes(query.toLowerCase())));
-  const title = page === 'home' ? 'Твоя музыка. Твои правила.' : page === 'search' ? 'Поиск' : 'Моя библиотека';
+  const title = page === 'admin' ? 'Админ-панель' : page === 'home' ? 'Твоя музыка. Твои правила.' : page === 'search' ? 'Поиск' : 'Моя библиотека';
 
+  const addPlaylist = () => { const name=prompt('Название плейлиста'); if(name?.trim()){setMyPlaylists(p=>[...p,{id:Date.now(),name:name.trim(),ids:[]}]);toast.success('Плейлист создан');} };
+  const uploadFiles = (e) => { const list=Array.from(e.target.files||[]).filter(f=>f.type.startsWith('audio/')).map((f,i)=>({id:Date.now()+i,title:f.name.replace(/\\.[^.]+$/,''),artist:'Моя загрузка',album:'Локальные файлы',color:'cover-purple',duration:'—',url:URL.createObjectURL(f)}));setLocalTracks(p=>[...p,...list]);if(list.length){setCurrent(list[0]);setPlaying(false);toast.success('Музыка добавлена');}e.target.value='';};
   return <div className="app-shell">\n    <Toaster position="top-center" toastOptions={{ duration: 1800 }} />
     <aside className="sidebar">
       <a className="brand" href="#" onClick={e => {e.preventDefault();setPage('home')}}><div className="brand-mark"><Headphones size={22}/></div><span>QSound<span className="brand-base">Base</span></span></a>
@@ -80,7 +86,7 @@ export default function App() {
       <button className={page==='search'?'nav-item active':'nav-item'} onClick={()=>setPage('search')}><Search size={19}/> Поиск</button>
       <button className={page==='library'?'nav-item active':'nav-item'} onClick={()=>{setPage('library');setFavoritesOnly(false)}}><Library size={19}/> Моя библиотека</button>
       <div className="side-divider"/>
-      <div className="side-label row-label">ТВОИ ПЛЕЙЛИСТЫ <button className="icon-button" title="Создать плейлист"><Plus size={16}/></button></div>
+      <div className="side-label row-label">ТВОИ ПЛЕЙЛИСТЫ <button className="icon-button" title="Создать плейлист" onClick={addPlaylist}><Plus size={16}/></button></div>
       <button className="playlist-link"><span className="playlist-icon purple"><Heart size={15}/></span> Любимые треки</button>
       <button className="playlist-link"><span className="playlist-icon teal"><ListMusic size={15}/></span> Ночной вайб</button>
       <button className="playlist-link"><span className="playlist-icon orange"><Disc3 size={15}/></span> В дороге</button>
@@ -91,6 +97,7 @@ export default function App() {
       <header className="topbar"><div className="mobile-brand"><div className="brand-mark"><Headphones size={19}/></div>QSound<span>Base</span></div><div className="top-actions"><span className="status-dot"/> <span className="status-text">Твоя музыкальная вселенная</span><button className="avatar top-avatar">{telegramUser?.first_name?.[0] || 'Q'}</button></div></header>
       <div className="content">
         <div className="greeting"><div className="eyebrow"><span className="eyebrow-line"/> Q S O U N D B A S E</div><h1>{title}</h1><p>{page==='home'?'Открой новые звуки и найди свой ритм.':'Найди трек, который звучит именно так, как ты.'}</p></div>
+        {page==='admin' && <section className="upload-panel"><h2>Загрузить музыку</h2><p>Выбери аудиофайлы на телефоне — они сразу появятся в плеере.</p><label className="upload-control">＋ Выбрать аудиофайлы<input type="file" accept="audio/*" multiple onChange={uploadFiles}/></label><p className="upload-note">Пока это локальная загрузка в текущем браузере. Для постоянного хранения и доступа с других устройств подключим Cloudflare R2.</p></section>}
         {page==='search' && <div className="search-box"><Search size={20}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Песня, исполнитель или альбом..."/>{query && <button onClick={()=>setQuery('')}>×</button>}</div>}
         {page==='home' && <motion.section className="hero" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, ease: "easeOut" }}><div className="hero-content"><span className="pill"><Sparkles size={13}/> FEATURED PLAYLIST</span><h2>Ночь звучит<br/><span>по-другому.</span></h2><p>Музыка для поздних поездок,<br/>больших мыслей и маленьких моментов.</p><button className="primary-button" onClick={()=>toggleTrack(tracks[0])}><Play size={17} fill="currentColor"/> Слушать подборку</button></div><div className="hero-art"><div className="orbit orbit-one"/><div className="orbit orbit-two"/><div className="hero-disc"><div className="disc-center"><Headphones size={42}/></div></div><div className="floating-note note-one">♫</div><div className="floating-note note-two">♪</div></div><div className="hero-footer"><span><span className="live-dot"/> QSB EDITION 001</span><span>MOOD · NIGHT DRIVE</span></div></motion.section>}
         {page==='home' && <div className="section-heading"><div><h2>Твой вайб сегодня</h2><p>Подборка под настроение</p></div><button className="text-button" onClick={()=>setPage('search')}>Все треки <span>↗</span></button></div>}
@@ -102,7 +109,7 @@ export default function App() {
       </div>
     </main>
 
-    <div className="player-bar"><div className="now-playing"><Cover track={current || tracks[0]} small/><div className="now-text"><b>{current?.title || 'Выбери трек'}</b><span>{current?.artist || 'QSoundBase'}</span></div><button className={liked.includes(current?.id)?'like-button liked':'like-button'} onClick={()=>current&&toggleLike(current.id)}><Heart size={16} fill={liked.includes(current?.id)?'currentColor':'none'}/></button></div><div className="player-center"><div className="player-controls"><button className={shuffleOn ? 'control-active' : ''} title="Перемешать" onClick={()=>setShuffleOn(!shuffleOn)}><Shuffle size={15}/></button><button onClick={()=>nextTrack(-1)}><SkipBack size={19} fill="currentColor"/></button><button className="play-button" onClick={()=>current?.url?setPlaying(!playing):setPlaying(false)}>{playing?<Pause size={19} fill="currentColor"/>:<Play size={19} fill="currentColor"/>}</button><button onClick={()=>nextTrack(1)}><SkipForward size={19} fill="currentColor"/></button><button title="Повтор"><Repeat2 size={15}/></button></div><div className="progress-row"><span>0:00</span><input type="range" min="0" max="100" value={progress} onChange={e=>setProgress(Number(e.target.value))}/><span>{current?.duration || '0:00'}</span></div></div><div className="player-extra"><button><ListMusic size={17}/></button><Volume2 size={17}/><input type="range" min="0" max="100" value={volume} onChange={e=>setVolume(Number(e.target.value))}/></div></div>
+    <div className="player-bar"><div className="now-playing"><Cover track={current || tracks[0]} small/><div className="now-text"><b>{current?.title || 'Выбери трек'}</b><span>{current?.artist || 'QSoundBase'}</span></div><button className={liked.includes(current?.id)?'like-button liked':'like-button'} onClick={()=>current&&toggleLike(current.id)}><Heart size={16} fill={liked.includes(current?.id)?'currentColor':'none'}/></button></div><div className="player-center"><div className="player-controls"><button className={shuffleOn ? 'control-active' : ''} title="Перемешать" onClick={()=>setShuffleOn(!shuffleOn)}><Shuffle size={15}/></button><button onClick={()=>nextTrack(-1)}><SkipBack size={19} fill="currentColor"/></button><button className="play-button" onClick={()=>current?.url?setPlaying(!playing):toast('Демо-трек без аудио. Загрузи свой файл через «Загрузить музыку».')}>{playing?<Pause size={19} fill="currentColor"/>:<Play size={19} fill="currentColor"/>}</button><button onClick={()=>nextTrack(1)}><SkipForward size={19} fill="currentColor"/></button><button title="Повтор"><Repeat2 size={15}/></button></div><div className="progress-row"><span>0:00</span><input type="range" min="0" max="100" value={progress} onChange={e=>{const v=Number(e.target.value);setProgress(v);if(audioRef.current?.duration)audioRef.current.currentTime=audioRef.current.duration*v/100}}/><span>{current?.duration || '0:00'}</span></div></div><div className="player-extra"><button><ListMusic size={17}/></button><Volume2 size={17}/><input type="range" min="0" max="100" value={volume} onChange={e=>setVolume(Number(e.target.value))}/></div></div>
     <audio ref={audioRef} onTimeUpdate={e=>{const a=e.currentTarget;setProgress(a.duration?Math.round(a.currentTime/a.duration*100):0)}} onEnded={()=>nextTrack(1)}/>
     <nav className="mobile-nav"><button className={page==='home'?'active':''} onClick={()=>setPage('home')}><Home size={20}/><span>Главная</span></button><button className={page==='search'?'active':''} onClick={()=>setPage('search')}><Search size={20}/><span>Поиск</span></button><button className={page==='library'?'active':''} onClick={()=>setPage('library')}><Library size={20}/><span>Библиотека</span></button></nav>
   </div>;

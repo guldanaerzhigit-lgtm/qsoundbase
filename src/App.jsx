@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
+import toast, { Toaster } from 'react-hot-toast';
 import { Home, Search, Library, Heart, Play, Pause, SkipBack, SkipForward, Shuffle, Repeat2, Volume2, MoreHorizontal, Plus, Music2, Headphones, Clock3, ChevronDown, ListMusic, Disc3, Radio, Sparkles } from 'lucide-react';
 
 const tracks = [
@@ -58,12 +60,19 @@ export default function App() {
     const next = tracks[nextIndex];
     setCurrent(next); setPlaying(Boolean(next.url)); setProgress(0);
   };
-  const toggleLike = (id) => setLiked(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  const toggleLike = (id) => {
+    const wasLiked = liked.includes(id);
+    setLiked(prev => wasLiked ? prev.filter(x => x !== id) : [...prev, id]);
+    toast(wasLiked ? 'Удалено из избранного' : 'Добавлено в избранное', {
+      icon: wasLiked ? '♡' : '♥',
+      style: { background: '#191824', color: '#f7f7fc', border: '1px solid #a78bfa35' }
+    });
+  };
   const visibleTracks = (page === 'library' && favoritesOnly ? tracks.filter(t => liked.includes(t.id)) : tracks)
     .filter(t => (page !== 'search' || query.trim() === '' || (t.title + t.artist + t.album).toLowerCase().includes(query.toLowerCase())));
   const title = page === 'home' ? 'Твоя музыка. Твои правила.' : page === 'search' ? 'Поиск' : 'Моя библиотека';
 
-  return <div className="app-shell">
+  return <div className="app-shell">\n    <Toaster position="top-center" toastOptions={{ duration: 1800 }} />
     <aside className="sidebar">
       <a className="brand" href="#" onClick={e => {e.preventDefault();setPage('home')}}><div className="brand-mark"><Headphones size={22}/></div><span>QSound<span className="brand-base">Base</span></span></a>
       <div className="side-label">МЕНЮ</div>
@@ -83,9 +92,9 @@ export default function App() {
       <div className="content">
         <div className="greeting"><div className="eyebrow"><span className="eyebrow-line"/> Q S O U N D B A S E</div><h1>{title}</h1><p>{page==='home'?'Открой новые звуки и найди свой ритм.':'Найди трек, который звучит именно так, как ты.'}</p></div>
         {page==='search' && <div className="search-box"><Search size={20}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Песня, исполнитель или альбом..."/>{query && <button onClick={()=>setQuery('')}>×</button>}</div>}
-        {page==='home' && <section className="hero"><div className="hero-content"><span className="pill"><Sparkles size={13}/> FEATURED PLAYLIST</span><h2>Ночь звучит<br/><span>по-другому.</span></h2><p>Музыка для поздних поездок,<br/>больших мыслей и маленьких моментов.</p><button className="primary-button" onClick={()=>toggleTrack(tracks[0])}><Play size={17} fill="currentColor"/> Слушать подборку</button></div><div className="hero-art"><div className="orbit orbit-one"/><div className="orbit orbit-two"/><div className="hero-disc"><div className="disc-center"><Headphones size={42}/></div></div><div className="floating-note note-one">♫</div><div className="floating-note note-two">♪</div></div><div className="hero-footer"><span><span className="live-dot"/> QSB EDITION 001</span><span>MOOD · NIGHT DRIVE</span></div></section>}
+        {page==='home' && <motion.section className="hero" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55, ease: "easeOut" }}><div className="hero-content"><span className="pill"><Sparkles size={13}/> FEATURED PLAYLIST</span><h2>Ночь звучит<br/><span>по-другому.</span></h2><p>Музыка для поздних поездок,<br/>больших мыслей и маленьких моментов.</p><button className="primary-button" onClick={()=>toggleTrack(tracks[0])}><Play size={17} fill="currentColor"/> Слушать подборку</button></div><div className="hero-art"><div className="orbit orbit-one"/><div className="orbit orbit-two"/><div className="hero-disc"><div className="disc-center"><Headphones size={42}/></div></div><div className="floating-note note-one">♫</div><div className="floating-note note-two">♪</div></div><div className="hero-footer"><span><span className="live-dot"/> QSB EDITION 001</span><span>MOOD · NIGHT DRIVE</span></div></motion.section>}
         {page==='home' && <div className="section-heading"><div><h2>Твой вайб сегодня</h2><p>Подборка под настроение</p></div><button className="text-button" onClick={()=>setPage('search')}>Все треки <span>↗</span></button></div>}
-        {page==='home' && <div className="mood-grid"><button className="mood-card mood-violet" onClick={()=>setPage('search')}><span>✦</span><b>Ночной вайб</b><small>Chill · Ambient</small></button><button className="mood-card mood-blue" onClick={()=>setPage('search')}><span>◉</span><b>В потоке</b><small>Electronic · Focus</small></button><button className="mood-card mood-pink" onClick={()=>setPage('search')}><span>♡</span><b>На повторе</b><small>Indie · Dream pop</small></button><button className="mood-card mood-green" onClick={()=>setPage('search')}><span>↗</span><b>Дорога</b><small>Synthwave · Retro</small></button></div>}
+        {page==='home' && <div className="mood-grid"><motion.button whileHover={{ y: -4, scale: 1.015 }} whileTap={{ scale: .98 }} className="mood-card mood-violet" onClick={()=>setPage('search')}><span>✦</span><b>Ночной вайб</b><small>Chill · Ambient</small></motion.button><motion.button whileHover={{ y: -4, scale: 1.015 }} whileTap={{ scale: .98 }} className="mood-card mood-blue" onClick={()=>setPage('search')}><span>◉</span><b>В потоке</b><small>Electronic · Focus</small></motion.button><motion.button whileHover={{ y: -4, scale: 1.015 }} whileTap={{ scale: .98 }} className="mood-card mood-pink" onClick={()=>setPage('search')}><span>♡</span><b>На повторе</b><small>Indie · Dream pop</small></motion.button><motion.button whileHover={{ y: -4, scale: 1.015 }} whileTap={{ scale: .98 }} className="mood-card mood-green" onClick={()=>setPage('search')}><span>↗</span><b>Дорога</b><small>Synthwave · Retro</small></motion.button></div>}
         <div className="section-heading tracks-heading"><div><h2>{page==='library'?'Твоя коллекция':page==='search'?'Результаты поиска':'Популярное в QSoundBase'}</h2><p>{page==='library'?'Собрано тобой':'Звуки, которые стоит услышать'}</p></div>{page==='library' && <button className="filter-button" onClick={()=>setFavoritesOnly(!favoritesOnly)}><Heart size={14} fill={favoritesOnly?'currentColor':'none'}/> Избранное</button>}</div>
         <div className="track-table"><div className="table-head"><span>#</span><span>ТРЕК</span><span>АЛЬБОМ</span><span><Clock3 size={14}/></span><span/></div>{visibleTracks.map((track,index)=><div className={current?.id===track.id?'track-row selected':'track-row'} key={track.id} onDoubleClick={()=>toggleTrack(track)}><span className="track-number">{current?.id===track.id&&playing?<span className="equalizer">▂▅▃</span>:String(index+1).padStart(2,'0')}</span><div className="track-info"><button className="track-cover-button" onClick={()=>toggleTrack(track)}><Cover track={track} small/><span className="cover-play"><Play size={15} fill="currentColor"/></span></button><div><b>{track.title}</b><span>{track.artist}</span></div></div><span className="album-name">{track.album}</span><span className="duration">{track.duration}</span><button className={liked.includes(track.id)?'like-button liked':'like-button'} onClick={()=>toggleLike(track.id)}><Heart size={16} fill={liked.includes(track.id)?'currentColor':'none'}/></button></div>)}</div>
         {visibleTracks.length===0 && <div className="empty-state"><Music2 size={30}/><b>Ничего не найдено</b><span>Попробуй другой запрос или добавь музыку в библиотеку.</span></div>}

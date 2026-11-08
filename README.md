@@ -1,28 +1,14 @@
-# QSoundBase
+# QAZ Music / QSoundbase
 
-Telegram Mini App — музыкальный сервис с собственным каталогом.
+React + Vite mobile-first music website prototype.
 
-## Запуск локально
+## Run locally
+
 ```bash
 npm install
 npm run dev
 ```
 
-## Сборка
-```bash
-npm run build
-```
+## Current status
 
-## Cloudflare Pages
-- Build command: `npm run build`
-- Build output directory: `dist`
-
-## Сейчас
-Первый UI/MVP: адаптивный интерфейс, поиск по демо-каталогу, переключение страниц, избранное и UI-плеер. Треки пока демонстрационные без аудио URL.
-
-## Следующие этапы
-1. Подключить Telegram Mini App SDK и проверку initData на сервере.
-2. Cloudflare R2 для аудиофайлов и обложек.
-3. Cloudflare Worker API для каталога и админ-загрузки.
-4. Firebase/Firestore для плейлистов, истории и лайков.
-5. Реальные права доступа администратора и загрузка музыки с разрешением на распространение.
+This is a UI prototype with demo tracks. Real audio playback/downloads, Cloudflare R2/D1/Workers API, admin panel, and Android compression are not yet connected. Only upload/download audio you have rights to distribute.
